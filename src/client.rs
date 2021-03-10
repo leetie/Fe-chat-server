@@ -24,19 +24,11 @@ fn main() {
     }
   });
   loop {
-    println!("Made it into loop");
     // get messages, send them through msg_tx
     get_message().unwrap();
     msg_tx.send(b"placeholder message").unwrap();
   }
-
-  // stream_tx_thread.join();
 }
-
-// fn write_to_stream(stream: mpsc::Sender<String>, msg: String) {
-//   // stream.write(msg.as_bytes());
-//   stream.send(msg).unwrap();
-// }
 
 fn get_message() -> Result<String, std::io::Error> {
   println!("Enter message:> ");

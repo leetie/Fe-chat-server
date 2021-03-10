@@ -1,5 +1,5 @@
 use std::{
-    io::{self, BufReader, Read, Write},
+    io::{self, BufRead, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
     str,
     sync::mpsc,
@@ -46,6 +46,9 @@ fn main() {
         }
     });
 
+    // check for new clients and new messages in a loop
+    // if new client, add to list
+    // if new message, rebroadcast to connected clients // TODO - configurability
     loop {
         match client_rx.try_recv() {
             Ok(client) => {
@@ -71,12 +74,12 @@ fn listen_to_client(client: TcpStream, tx: mpsc::Sender<String>) {
     println!("Listening to this client: {:?}", client);
     let peer_addr = client.peer_addr().unwrap();
     let mut reader = BufReader::new(client);
-    let mut str = String::new(); // temporary, construct a Message later
-                                 // reader.read_line ? would have to check on client side that \n's are being sent (check vulnerability in read_line docs)
-    while match reader.read(&mut [0; 1024]) {
+    // reader.read_line ? would have to check on client side that \n's are being sent (check vulnerability in read_line docs)
+    let mut str = String::new();
+    while match reader.read_line(&mut str) {
         Ok(_) => {
             println!("Reading string from client...");
-            tx.send(str.clone()).unwrap();
+            tx.send(str).unwrap();
             str = String::new();
             true
         }
@@ -110,9 +113,9 @@ struct ClientConfig {
 }
 
 enum DisplayColor {
-    white,
-    red,
-    green,
-    blue,
-    yellow,
+    White,
+    Red,
+    Green,
+    Blue,
+    Yellow,
 }
