@@ -5,8 +5,6 @@ use std::{
     sync::mpsc,
     thread,
 };
-mod lib;
-use lib::Config;
 
 fn main() {
     let mut port = String::new();
@@ -79,13 +77,14 @@ fn listen_to_client(client: TcpStream, tx: mpsc::Sender<String>) {
     while match reader.read_line(&mut str) {
         Ok(_) => {
             println!("Reading string from client...");
+            println!("{}", str);
             tx.send(str).unwrap();
             str = String::new();
             true
         }
         Err(e) => {
             println!(
-                "Error occured: {} \n termination connection with {}",
+                "Error occured: {} \n terminating connection with {}",
                 e, peer_addr
             );
             false
